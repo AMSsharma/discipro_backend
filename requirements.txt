@@ -12,4 +12,6 @@ django-cors-headers==4.7.0           # For image handling (if avatars)
 youtube-transcript-api
 openai
 google-generativeai
+gunicorn
+
 
