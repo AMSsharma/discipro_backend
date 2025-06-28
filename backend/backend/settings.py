@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-ROOT_URLCONF = "backend.urls"
+ROOT_URLCONF = "backend.backend.urls"
 OPENAI_API_KEY = "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"
 #GEMINI_API_KEY = "AIzaSyBFykIrPe4_4dG0P-cVnezCPpbXnyYCJH4"
 
