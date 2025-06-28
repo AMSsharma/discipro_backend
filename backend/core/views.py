@@ -143,36 +143,88 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from .models import UserScore
 
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def update_user_score(request):
+#     username = request.data.get('username')
+#     #print(request.data)
+#     new_overall = int(request.data.get('overall_score',0))
+#    # print(f"hey broooo {username} {new_overall}")
+#     try:
+#         user = User.objects.get(username=username)
+#     except User.DoesNotExist:
+#         return Response({'error': 'User not found'}, status=404)
+#     score_obj, created = UserScore.objects.get_or_create(user=user)
+
+#     today = now().date()
+#     last_update = score_obj.last_updated_date
+#     score_diff = new_overall - score_obj.overall_score
+
+#     if today != last_update:
+#         # Reset daily score
+#         score_obj.daily_score = 0
+
+#         # Reset weekly score if week has changed
+#         if today.isocalendar()[1] != last_update.isocalendar()[1]:
+#             score_obj.weekly_score = 0
+
+#     score_obj.daily_score += score_diff
+#     score_obj.weekly_score += score_diff
+#     score_obj.overall_score = new_overall
+#     score_obj.last_updated_date = today
+
+#     score_obj.save()
+
+#     return Response({
+#         'message': 'Score updated',
+#         'daily_score': score_obj.daily_score,
+#         'weekly_score': score_obj.weekly_score,
+#         'overall_score': score_obj.overall_score
+#     })
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def update_user_score(request):
     username = request.data.get('username')
-    print(request.data)
-    new_overall = int(request.data.get('overall_score',0))
-    print(f"hey broooo {username} {new_overall}")
+    new_overall = int(request.data.get('overall_score', 0))
+
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
+
     score_obj, created = UserScore.objects.get_or_create(user=user)
 
-    today = now().date()
-    last_update = score_obj.last_updated_date
+    today = timezone.now().date()
+
+    # Set default for newly created scores
+    if created:
+        score_obj.last_updated_date = today
+        score_obj.save()
+    for score_obj in UserScore.objects.all():
+        last_update = score_obj.last_updated_date
+        if today != last_update:
+            score_obj.daily_score = 0
+            if today.isocalendar()[1] != last_update.isocalendar()[1]:
+                score_obj.weekly_score = 0
+            score_obj.last_updated_date = today
+            score_obj.save()
+    # last_update = score_obj.last_updated_date
     score_diff = new_overall - score_obj.overall_score
 
-    if today != last_update:
-        # Reset daily score
-        score_obj.daily_score = 0
+    # # Reset daily score if it's a new day
+    # if today != last_update:
+    #     score_obj.daily_score = 0
 
-        # Reset weekly score if week has changed
-        if today.isocalendar()[1] != last_update.isocalendar()[1]:
-            score_obj.weekly_score = 0
+    #     # Reset weekly score if the week number has changed
+    #     if today.isocalendar()[1] != last_update.isocalendar()[1]:
+    #         score_obj.weekly_score = 0
 
+    # Update scores
     score_obj.daily_score += score_diff
     score_obj.weekly_score += score_diff
     score_obj.overall_score = new_overall
+    score_obj.last_score = score_obj.overall_score  # optional
     score_obj.last_updated_date = today
-
     score_obj.save()
 
     return Response({
@@ -181,6 +233,7 @@ def update_user_score(request):
         'weekly_score': score_obj.weekly_score,
         'overall_score': score_obj.overall_score
     })
+
     from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import UserScore
