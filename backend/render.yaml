@@ -3,7 +3,7 @@ services:
     name: django-backend
     runtime: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn discipro.wsgi:application"
+    startCommand: "gunicorn backend.backend.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: backend.settings
