@@ -29,12 +29,11 @@ SECRET_KEY = "django-insecure-zarp-$4y-^!8x^$#ozl+25=j1eik0^+8zfgdkro)%##8lf^o7a
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.35.203',
-    '127.0.0.1'
-    '0.0.0.0'
+    # '192.168.35.203',
+    # '127.0.0.1'
+    # '0.0.0.0'
+    # 'discipro.render.com'
     '*'
-    'discipro_backend.onrender.com'
-
 ]
 
 

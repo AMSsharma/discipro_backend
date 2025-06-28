@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: django-backend
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn discipro.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: backend.settings
+      - key: SECRET_KEY
+        value: "django-insecure-zarp-$4y-^!8x^$#ozl+25=j1eik0^+8zfgdkro)%##8lf^o7a"
+      - key: DEBUG
+        value: "False"
