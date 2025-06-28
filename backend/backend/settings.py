@@ -47,9 +47,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'rest_framework',
-    'corsheaders',
-    'core',
-    'quiz',
+    'corsheaders'
+    'backend.core',
 ]
 AUTHENTICATION_BACKENDS=[
     'django.contrib.auth.backends.ModelBackend'
