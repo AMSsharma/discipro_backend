@@ -158,49 +158,45 @@ last_global_reset = {"date": None}
 @permission_classes([AllowAny])
 def update_user_score(request):
     username = request.data.get('username')
-    overall_score_raw = request.data.get('overall_score')
-
-    if not username:
-        return Response({'error': 'Username is required'}, status=400)
-
-    try:
-        new_overall = int(overall_score_raw)
-    except (TypeError, ValueError):
-        return Response({'error': 'Invalid or missing overall_score'}, status=400)
+    new_overall = int(request.data.get('overall_score', 0))
 
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
 
+    score_obj, created = UserScore.objects.get_or_create(user=user)
+
     today = timezone.now().date()
-    current_week = today.isocalendar()[1]
 
-    # GLOBAL RESET LOGIC (on first hit of the day)
-    if last_global_reset["date"] != today:
-        all_scores = UserScore.objects.all()
-        for score in all_scores:
-            if score.last_updated_date != today:
-                # Reset daily
-                score.daily_score = 0
-
-                # Reset weekly if week number changed
-                if score.last_updated_date.isocalendar()[1] != current_week:
-                    score.weekly_score = 0
-
-                score.last_updated_date = today
-                score.save()
-        
-        last_global_reset["date"] = today  # Update the cache marker
-
-    score_obj, _ = UserScore.objects.get_or_create(user=user)
-
+    # Set default for newly created scores
+    if created:
+        score_obj.last_updated_date = today
+        score_obj.save()
+    for score_obj in UserScore.objects.all():
+        last_update = score_obj.last_updated_date
+        if today != last_update:
+            score_obj.daily_score = 0
+            if today.isocalendar()[1] != last_update.isocalendar()[1]:
+                score_obj.weekly_score = 0
+            score_obj.last_updated_date = today
+            score_obj.save()
+    # last_update = score_obj.last_updated_date
     score_diff = new_overall - score_obj.overall_score
 
+    # # Reset daily score if it's a new day
+    # if today != last_update:
+    #     score_obj.daily_score = 0
+
+    #     # Reset weekly score if the week number has changed
+    #     if today.isocalendar()[1] != last_update.isocalendar()[1]:
+    #         score_obj.weekly_score = 0
+
+    # Update scores
     score_obj.daily_score += score_diff
     score_obj.weekly_score += score_diff
     score_obj.overall_score = new_overall
-    score_obj.last_score = new_overall
+    score_obj.last_score = score_obj.overall_score  # optional
     score_obj.last_updated_date = today
     score_obj.save()
 
