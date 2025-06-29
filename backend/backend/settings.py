@@ -17,6 +17,8 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 GOOGLE_API_KEY = os.getenv("AIzaSyBMFAnVmpIpyhRajdKOH17NluSiN1QEI9Y")
+DEBUG = os.environ.get('RENDER', None) is None
+RENDER = os.environ.get('RENDER', False)  # Custom flag if needed
 
 
 
