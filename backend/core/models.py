@@ -20,7 +20,7 @@ class UserScore(models.Model):
     weekly_score = models.IntegerField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
     last_score = models.IntegerField(default=0)  # to track score before the latest update
-    last_updated_date = models.DateField()
+    last_updated_date = models.DateField(default=datetime.date.today)
     def __str__(self):
         return f"{self.user.username} - {self.overall_score}"
 
